@@ -255,3 +255,6 @@ class IRModule(Node):
 
     def __repr__(self):
         return self.astext()
+
+def printIRModule(mod):
+    return _ffi_api.PrintIRModule(mod)

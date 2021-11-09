@@ -88,4 +88,36 @@ TVM_REGISTER_GLOBAL("ir.PrettyPrint").set_body_typed(PrettyPrint);
 
 TVM_REGISTER_GLOBAL("ir.AsText").set_body_typed(AsText);
 
+#define DEBUGLOG(message1, message2) std::cout << "[DEBUG] " << message1 << message2 << std::endl
+
+String PrintIRMoudle(const IRModule& mod) {
+  // for (auto kv : mod->type_definitions) {
+  //   DEBUGLOG(kv.first);
+  //   DEBUGLOG(kv.second);
+  // }
+  for (auto kv : mod->functions) {
+    DEBUGLOG("function name: ", kv.first->name_hint);
+    // DEBUGLOG(kv.second);
+    DEBUGLOG("is relay::FunctionNode? : ", kv.second.as<relay::FunctionNode>());
+    relay::Function fn = Downcast<relay::Function>(kv.second);
+    DEBUGLOG("type_params' size: ", fn->type_params.size());
+    if (fn->type_params.size() > 0) {
+      DEBUGLOG("is size > 0 : ", "yes");
+    }
+    for (relay::Var param : fn->params) {
+      std::string name = param->name_hint();
+      if (name.length() == 0 || std::isalpha(name[0])) {
+        name = "v" + name;
+      }
+      DEBUGLOG("param name: ", name);
+      if (param->type_annotation.defined()) {
+        DEBUGLOG("type_annotaion type: ", typeid(param->type_annotation).name());
+      }
+    }
+  }
+  return String("done");
+}
+
+TVM_REGISTER_GLOBAL("ir.PrintIRModule").set_body_typed(PrintIRMoudle);
+
 }  // namespace tvm
